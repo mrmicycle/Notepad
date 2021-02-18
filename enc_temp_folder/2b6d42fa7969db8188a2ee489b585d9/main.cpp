@@ -49,9 +49,11 @@ int main()
                 // do nothing
             }
             
-            else if (curr == start)//delete something located at "start" but its not the beginning of the linked list
+            else if (curr == start)//delete something located at "start"
             {
-                Node* del = start;// mark start for deletion
+                // If I want to DELETE the start:
+                // need to 
+                Node* del = start;
                 start = start->next;
                 curr = curr->next;
                 delete (del);
