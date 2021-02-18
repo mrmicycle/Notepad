@@ -25,7 +25,7 @@ int main()
     /*while (1)
     {
         c = _getch();
-        cout << c << endl;
+        cout << (int)c << endl;
     }*/
 
 
@@ -37,7 +37,7 @@ int main()
         {
             break;
         }
-        if (c == 8) // backspace
+        if (c == 8) // backspace, need to add backspace function? for not at end
         {
             if (curr->prev == nullptr)
             {
@@ -58,7 +58,7 @@ int main()
             c = _getch();
             if (c == 75)//left key
             {
-                if (curr->prev == nullptr)
+                if (curr == nullptr)
                 {
                     //do nothing!
                 }
@@ -72,7 +72,7 @@ int main()
             }
             if (c == 77)//right key
             {
-                if (curr->next == nullptr)//if at the end of linked list
+                if (curr == nullptr)//if at the end of linked list
                 {
                     //do nothing!
                 }
@@ -84,7 +84,7 @@ int main()
                 
             }
         }
-        else 
+        else //normal characters
         {
             if (start == nullptr)
             {
@@ -105,6 +105,16 @@ int main()
                     curr = end;
                     x++;
                 }
+                else if (curr == start)//allow new character at beginning
+                {
+                    Node* p = new Node(c);//create new, Need to change 4 pointers.
+                    p->next = curr->next;// make new node point to the current next node
+                    curr->next->prev = p;// make the current next node point BACK to the new node p
+                    p->prev = curr;//make p point back to the current
+                    curr->next = p;//make the current point to p
+                    curr = p;//finally, make the new node the current node
+                    x++;
+                }
                 else if (curr->next != nullptr && curr->prev != nullptr)//is there anything to the left and right? (insert)
                 {
                     Node* p = new Node(c);//create new, Need to change 4 pointers.
@@ -123,7 +133,7 @@ int main()
         while (T != nullptr)
         {
             cout << T->letter;
-            T = T->next;
+            T = T->next;            
         }
         gotoxy(x, y);
 
