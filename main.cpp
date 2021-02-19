@@ -37,24 +37,28 @@ int main()
     while (1)
     {
         c = _getch();
-        cout << c;
+        //cout << c; get rid of alphas
         if (c == 27) // escape loop
         {
             break;
         }
         if (c == 8) // backspace
         {
-            if (curr == NULL) 
+            if (curr == NULL || curr == nullptr) 
             {
                 // do nothing
             }
             
-            else if (curr == start)//delete something located at "start" but its not the beginning of the linked list
+            else if (curr == start)//delete something located at "start" but its not the beginning of the linked list **PROBLEM HERE**
+            // CURRENT DOES NOT END UP WHERE I THINK IT DOES
             {
-                Node* del = start;// mark start for deletion
-                start = start->next;
-                curr = curr->next;
-                delete (del);
+                Node* del = curr;// mark curr? for deletion
+                curr->prev = nullptr;
+                start = start -> next;// move start to the next node **does this work???***
+                curr = nullptr;// curr ends up outside of the linked list in this case only
+                if (start != nullptr)
+                    start->prev = nullptr;
+                delete (del);//delete the node
                 //delete(start->prev);
                 //start->prev = nullptr;
                 x--;
@@ -64,7 +68,7 @@ int main()
             {
                 Node* del = curr;
                 curr->prev->next = curr->next;//connect previous to next
-                curr->next->prev = curr->prev;
+                curr->next->prev = curr->prev;//connect next to prev
                 curr = curr->prev;
                 delete(del);
                 x--;
@@ -84,13 +88,13 @@ int main()
             c = _getch();
             if (c == 75)//left key
             {
-                if (curr == NULL)
+                if (curr == NULL || start == nullptr)
                 {
                     //do nothing!
                 }
-                else
+                else// I am missing another "filter" so to speak
                 {
-                    //
+                    //make null under certain condition?
                     curr = curr->prev;
                     x--;
                 }
@@ -98,14 +102,18 @@ int main()
             }
             if (c == 77)//right key
             {
-                if (curr == NULL)
+                if (start == nullptr)//we're at the start and there's nothing to go right to
                 {
-                    curr = start;
-                    x++;
+                    // do nothing!
                 }
                 else if (curr == end)//if at the end of linked list
                 {
                     //do nothing!
+                }
+                else if (curr == NULL)// curr is technically in start->prev, allows you to move back into linked list
+                {
+                    curr = start;
+                    x++;
                 }
                 else if (curr->next != NULL)//curr==NULL by itself makes cursor go right endlessly
                 {
@@ -133,44 +141,36 @@ int main()
             /*if (curr == start) {
 
             }*/
-            else
+            else if (curr == end)//adding new characters at the end of the linked list (row?)
             {
-                if (curr == end)//adding new characters at the end of the linked list (row?)
-                {
                     Node* p = new Node(c);
                     end->next = p;
                     p->prev = end;
                     end = p;
                     curr = end;
                     x++;
-                }
-                else if (curr == NULL)//allow new character at beginning, BEFORE start.
-                {
-                    // need to edit
-                    // make new p curr
-                    // make new p start
-                    Node* p = new Node(c);
-                    p->next = start;
-                    start->prev = p;
-                    start = p;
-                    curr = p;
-                    x++;
-                }
-                //else if (curr == start)//apparently i need a condition where curr is at start?????
-                //{
-                //    Node* p = new Node(c);
-
-                //}
-                else if ((curr->next != nullptr && curr->prev != nullptr) || curr == start)//is there anything to the left and right? (insert)
-                {
-                    Node* p = new Node(c);//create new, Need to change 4 pointers.
-                    p->next = curr->next;// make new node point to the current next node
-                    curr->next->prev = p;// make the current next node point BACK to the new node p
-                    p->prev = curr;//make p point back to the current
-                    curr->next = p;//make the current point to p
-                    curr = p;//finally, make the new node the current node
-                    x++;
-                }
+            }
+            else if (curr == NULL)//allow new character at beginning, BEFORE start.
+            {
+                // need to edit
+                // make new p curr
+                // make new p start
+                Node* p = new Node(c);
+                p->next = start;
+                start->prev = p;
+                start = p;
+                curr = p;
+                x++;
+            }               
+            else if ((curr->next != nullptr && curr->prev != nullptr) || curr == start)//is there anything to the left and right? (insert)
+            {
+                Node* p = new Node(c);//create new, Need to change 4 pointers.
+                p->next = curr->next;// make new node point to the current next node
+                curr->next->prev = p;// make the current next node point BACK to the new node p
+                p->prev = curr;//make p point back to the current
+                curr->next = p;//make the current point to p
+                curr = p;//finally, make the new node the current node
+                x++;
             }
         }
         system("cls");
