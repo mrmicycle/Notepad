@@ -30,6 +30,7 @@ int main()
     char c;
     int rowNum = 0;
     int rowMax = 9;
+    int rowCount = 0;// this is SEPARATE from row num, will keep a running total of rows IN USE.
 
 
     x = y = 0;
@@ -62,13 +63,14 @@ int main()
                 start = end = curr = nullptr;
                 x = 0;// in a new row, go all the way left
                 y++;// and you go down one!
+                rowCount++;
             }
              
             
         }
         else if (c == 8) // backspace
         {
-            if (curr == NULL || curr == nullptr) 
+            if (curr == NULL || curr == nullptr || curr->letter == '\0') 
             {
                 // do nothing
             }
@@ -77,11 +79,12 @@ int main()
             // CURRENT DOES NOT END UP WHERE I THINK IT DOES
             {
                 Node* del = curr;// mark curr? for deletion
-                curr->prev = nullptr;
+                curr->prev = row[rowNum];
+                curr->prev->next = curr->next;
                 start = start -> next;// move start to the next node **does this work???***
-                curr = nullptr;// curr ends up outside of the linked list in this case only
-                if (start != nullptr)
-                    start->prev = nullptr;
+                curr = row[rowNum];// curr ends up outside of the linked list in this case only
+                /*if (start != nullptr)
+                    start->prev = nullptr;*/
                 delete (del);//delete the node
                 //delete(start->prev);
                 //start->prev = nullptr;
@@ -112,7 +115,7 @@ int main()
             c = _getch();
             if (c == 75)//left key
             {
-                if (curr == NULL || start == nullptr)
+                if (curr == NULL || start == nullptr || curr->letter == '\0')//null terminator means i'm currently in the row pointer.
                 {
                     //do nothing!
                 }
@@ -126,14 +129,11 @@ int main()
             }
             if (c == 77)//right key
             {
-                if (start == nullptr)//we're at the start and there's nothing to go right to
+                if (start == nullptr || curr == end)//we're at the start and there's nothing to go right to or at end of linked list
                 {
                     // do nothing!
                 }
-                else if (curr == end)//if at the end of linked list
-                {
-                    //do nothing!
-                }
+                
                 else if (curr == NULL)// curr is technically in start->prev, allows you to move back into linked list
                 {
                     curr = start;
@@ -155,37 +155,85 @@ int main()
             {
                 // when going up cycle through the linked list up there starting with 
                 // row[rowNum]. Then go next up until the amount of x?
-                if (y == 0) 
+                if (rowNum == 0) //fix
                 {
                     // do nothing!
                 }
                 else 
                 {
+                    /*if (rowNum > 0)
+                    {
+                        y--;
+                        rowNum--;
+                        curr
+                    }*/
                     y--;
                     rowNum--;
+                    // use rowNum to determine whether the cursor can move or not
                     curr = row[rowNum];// this puts it at the start of the previous row
-                    for (int i=0; i < x; i++)
+                    start = curr->next;
+                    for (int i = 0; i < x ; i++)
                     {
-                        curr = curr->next;
+                        if (curr->next == nullptr)
+                        {
+                            ;//set end of row, then
+                            break;//break loop when curr reaches end of row.
+                        }
+                        else
+                        {
+                            curr = curr->next;
+                        }
+
                     }
+                    // NEED TO SET END
+                    Node* check = start;
+                    while (check->next != end)
+                        check = check->next;
+                    end = check;
+                    delete(check);
                 }
-                
             }
             if (c == 80)// down
             {
-                if (y == rowMax)
+                if (y == rowMax || rowNum == rowCount )//fix, might be able to take out rowNum
                 {
                     // do nothing!
                 }
                 else
                 {
+                    //ARROW KEYS DO NOT CHANGE ROWCOUNT
                     y++;
                     rowNum++;
-                    curr = row[rowNum];// this puts it at the start of the previous row
-                    for (int i = 0; i < x; i++)
+                    curr = row[rowNum];// this puts it at the start of the next row
+                    start = curr->next;
+                    //if (curr == nullptr && curr == end) 
+                    //{
+                    //    // similar to presing enter
+                    //    // if the row is empty, just move cursor to beginning of the row, set curr to start.
+                    //    curr = start;
+                    //    x = 0;
+                    //}
+                    
+                    //move the cursor to the end of the current row.
+                    for (int i = 0; i < x+1; i++)
                     {
-                        curr = curr->next;
+                        if (curr->next == nullptr)
+                        {
+                            ;//set end of row, then
+                            break;//break loop when curr reaches end of row.
+                        }
+                        else 
+                        {
+                            curr = curr->next;
+                        }
+                            
                     }
+                    // NEED TO SET END
+                    Node* check = start;
+                    while (check->next != end)
+                        check = check->next;
+                    end = check;
+                    delete(check);
                 }
             }
         }
@@ -194,11 +242,12 @@ int main()
             if (start == nullptr)//first character
             {
                 Node* p = new Node(c);
+                row[rowNum] = new Node(NULL);
                 start = p;
                 end = start;
                 curr = end;
                 x++;
-                row[rowNum] = start;
+                row[rowNum]->next = start;
                 start->prev = row[rowNum];
             }
             /*if (curr == start) {
@@ -242,9 +291,10 @@ int main()
             if (row[i] != nullptr)
             {
                 Node* T;
-                T = row[i];
+                T = row[i]->next;//get first letter of row;
                 while (T != nullptr)
                 {
+                    
                     cout << T->letter;
                     T = T->next;
                 }
@@ -259,6 +309,7 @@ int main()
     cout << "\n deleting nodes";
 
     // garbage collection, freeing pointers?
+    // need to free pointers in ROW ARRAY
     Node* T;
     T = start;
     while (T != nullptr)
