@@ -22,7 +22,15 @@ int main()
     Node* start = nullptr;
     Node* end = nullptr;
     Node* curr = nullptr;//for inserting new nodes in custom positions
+    Node* row[10];
+    // clean the row array to make it all nullptr, "clean"
+    for (int i = 0; i < 10; i++) {
+        row[i] = nullptr;
+    }
     char c;
+    int rowNum = 0;
+    int rowMax = 9;
+
 
     x = y = 0;
     cout << "Start typing!" << endl;
@@ -42,7 +50,23 @@ int main()
         {
             break;
         }
-        if (c == 8) // backspace
+        else if (c == 13)//enter
+        {
+            if (rowNum > 8)
+            {
+                //do nothing!
+            }
+            else
+            {
+                rowNum++;
+                start = end = curr = nullptr;
+                x = 0;// in a new row, go all the way left
+                y++;// and you go down one!
+            }
+             
+            
+        }
+        else if (c == 8) // backspace
         {
             if (curr == NULL || curr == nullptr) 
             {
@@ -127,6 +151,43 @@ int main()
                 }
                 
             }
+            if (c == 72)// up
+            {
+                // when going up cycle through the linked list up there starting with 
+                // row[rowNum]. Then go next up until the amount of x?
+                if (y == 0) 
+                {
+                    // do nothing!
+                }
+                else 
+                {
+                    y--;
+                    rowNum--;
+                    curr = row[rowNum];// this puts it at the start of the previous row
+                    for (int i=0; i < x; i++)
+                    {
+                        curr = curr->next;
+                    }
+                }
+                
+            }
+            if (c == 80)// down
+            {
+                if (y == rowMax)
+                {
+                    // do nothing!
+                }
+                else
+                {
+                    y++;
+                    rowNum++;
+                    curr = row[rowNum];// this puts it at the start of the previous row
+                    for (int i = 0; i < x; i++)
+                    {
+                        curr = curr->next;
+                    }
+                }
+            }
         }
         else //normal characters
         {
@@ -137,6 +198,8 @@ int main()
                 end = start;
                 curr = end;
                 x++;
+                row[rowNum] = start;
+                start->prev = row[rowNum];
             }
             /*if (curr == start) {
 
@@ -174,12 +237,19 @@ int main()
             }
         }
         system("cls");
-        Node* T;
-        T = start;
-        while (T != nullptr)
+        for (int i = 0; i < 10; i++)
         {
-            cout << T->letter;
-            T = T->next;            
+            if (row[i] != nullptr)
+            {
+                Node* T;
+                T = row[i];
+                while (T != nullptr)
+                {
+                    cout << T->letter;
+                    T = T->next;
+                }
+            }
+            cout << endl;//need to actually print out on the next line, this isn't controlled by goto
         }
         gotoxy(x, y);
 
