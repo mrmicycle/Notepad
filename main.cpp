@@ -172,11 +172,27 @@ int main()
                     // use rowNum to determine whether the cursor can move or not
                     curr = row[rowNum];// this puts it at the start of the previous row
                     start = curr->next;
+
+                    // NEED TO SET END
+                    Node* check = start;
+                    while (check->next != nullptr)
+                        check = check->next;
+                    end = check;
+                    end->next = nullptr;
+                    //delete(check);
+
+
+                    //adjust for size x row
                     for (int i = 0; i < x ; i++)
                     {
-                        if (curr->next == nullptr)
+                        if (curr == end)
                         {
-                            ;//set end of row, then
+                            x = i;
+                            break;
+                        }
+                        else if (curr->next == nullptr)
+                        {
+                            //set end of row, then
                             break;//break loop when curr reaches end of row.
                         }
                         else
@@ -185,13 +201,7 @@ int main()
                         }
 
                     }
-                    // NEED TO SET END
-                    Node* check = start;
-                    while (check->next != nullptr)
-                        check = check->next;
-                    end = check;
-                    end->next = nullptr;
-                    //delete(check);
+                    
                 }
             }
             if (c == 80)// down
@@ -223,10 +233,24 @@ int main()
                         //    x = 0;
                         //}
 
+                        // NEED TO SET END
+                        Node* check = start;
+                        while (check->next != nullptr)
+                            check = check->next;
+                        end = check;
+                        end->next = nullptr;
+                        //delete(check);
+                        // deleting check will make end disappear
+
                         //move the cursor to the end of the current row.
                         for (int i = 0; i < x; i++)
                         {
-                            if (curr->next == nullptr)
+                            if (curr == end)
+                            {
+                                x = i;
+                                break;
+                            }
+                            else if (curr->next == nullptr)
                             {
                                 ;//set end of row, then
                                 break;//break loop when curr reaches end of row.
@@ -237,14 +261,7 @@ int main()
                             }
 
                         }
-                        // NEED TO SET END
-                        Node* check = start;
-                        while (check->next != nullptr)
-                            check = check->next;
-                        end = check;
-                        end->next = nullptr;
-                        //delete(check);
-                        // deleting check will make end disappear
+                        
                     }
                     
                 }
@@ -275,7 +292,7 @@ int main()
                     curr = end;
                     x++;
             }
-            else if (curr == NULL)//allow new character at beginning, BEFORE start.
+            else if (curr == NULL || curr->letter == '\0')//allow new character at beginning, BEFORE start.
             {
                 // need to edit
                 // make new p curr
@@ -283,6 +300,8 @@ int main()
                 Node* p = new Node(c);
                 p->next = start;
                 start->prev = p;
+                p->prev = curr;//point new node to current row
+                curr->next = p;// make row point to new node
                 start = p;
                 curr = p;
                 x++;
