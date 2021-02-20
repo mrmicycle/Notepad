@@ -187,10 +187,11 @@ int main()
                     }
                     // NEED TO SET END
                     Node* check = start;
-                    while (check->next != end)
+                    while (check->next != nullptr)
                         check = check->next;
                     end = check;
-                    delete(check);
+                    end->next = nullptr;
+                    //delete(check);
                 }
             }
             if (c == 80)// down
@@ -205,35 +206,47 @@ int main()
                     y++;
                     rowNum++;
                     curr = row[rowNum];// this puts it at the start of the next row
-                    start = curr->next;
-                    //if (curr == nullptr && curr == end) 
-                    //{
-                    //    // similar to presing enter
-                    //    // if the row is empty, just move cursor to beginning of the row, set curr to start.
-                    //    curr = start;
-                    //    x = 0;
-                    //}
-                    
-                    //move the cursor to the end of the current row.
-                    for (int i = 0; i < x+1; i++)
+                    if (curr == nullptr)
                     {
-                        if (curr->next == nullptr)
-                        {
-                            ;//set end of row, then
-                            break;//break loop when curr reaches end of row.
-                        }
-                        else 
-                        {
-                            curr = curr->next;
-                        }
-                            
+                        // do nothing with curr or start, because there is nothing in that row 
+                        // if curr->letter = '\0' then something was inserted
+                        // bc when i add a letter, i create a pointer in that row array
                     }
-                    // NEED TO SET END
-                    Node* check = start;
-                    while (check->next != end)
-                        check = check->next;
-                    end = check;
-                    delete(check);
+                    else
+                    {
+                        start = curr->next;//set start to first character in the row
+                        //if (curr == nullptr && curr == end) 
+                        //{
+                        //    // similar to presing enter
+                        //    // if the row is empty, just move cursor to beginning of the row, set curr to start.
+                        //    curr = start;
+                        //    x = 0;
+                        //}
+
+                        //move the cursor to the end of the current row.
+                        for (int i = 0; i < x; i++)
+                        {
+                            if (curr->next == nullptr)
+                            {
+                                ;//set end of row, then
+                                break;//break loop when curr reaches end of row.
+                            }
+                            else
+                            {
+                                curr = curr->next;
+                            }
+
+                        }
+                        // NEED TO SET END
+                        Node* check = start;
+                        while (check->next != nullptr)
+                            check = check->next;
+                        end = check;
+                        end->next = nullptr;
+                        //delete(check);
+                        // deleting check will make end disappear
+                    }
+                    
                 }
             }
         }
