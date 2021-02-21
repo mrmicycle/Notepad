@@ -65,7 +65,64 @@ int main()
                 //cout << "what is the name of your file?" << endl;
                 //getline(cin, filename);
                 ifstream openfile("myfile.txt");
-
+                while (openfile >> noskipws >> c) {//read each character from file without skipping whitespaces
+                    //cout << c;
+                    //convert each character to a linked list
+                    if (c == '\n')//newline, specific to reading from file
+                    {
+                        // end row
+                        start = end = curr = nullptr;
+                        rowNum++;
+                        rowCount++;
+                        y++;
+                        x = 0;
+                    }
+                    else if (start == nullptr)//first character
+                    {
+                        Node* p = new Node(c);
+                        row[rowNum] = new Node(NULL);
+                        start = p;
+                        end = start;
+                        curr = end;
+                        x++;
+                        row[rowNum]->next = start;
+                        start->prev = row[rowNum];
+                    }
+                    else if (curr == end)//adding new characters at the end of the linked list (row?)
+                    {
+                        Node* p = new Node(c);
+                        end->next = p;
+                        p->prev = end;
+                        end = p;
+                        curr = end;
+                        x++;
+                    }
+                    else if (curr == NULL || curr->letter == '\0')//allow new character at beginning, BEFORE start. CURRENT CAN'T BE NULL HERE
+                    {
+                        // need to edit
+                        // make new p curr
+                        // make new p start
+                        Node* p = new Node(c);
+                        p->next = start;
+                        start->prev = p;
+                        p->prev = curr;//point new node to current row
+                        curr->next = p;// make row point to new node
+                        start = p;
+                        curr = p;
+                        x++;
+                    }
+                    else if ((curr->next != nullptr && curr->prev != nullptr) || curr == start)//is there anything to the left and right? (insert)
+                    {
+                        Node* p = new Node(c);//create new, Need to change 4 pointers.
+                        p->next = curr->next;// make new node point to the current next node
+                        curr->next->prev = p;// make the current next node point BACK to the new node p
+                        p->prev = curr;//make p point back to the current
+                        curr->next = p;//make the current point to p
+                        curr = p;//finally, make the new node the current node
+                        x++;
+                    }
+                }
+                openfile.close();
 
             }
             if (c == 60)//f2 write to file
@@ -110,7 +167,7 @@ int main()
         }
         else if (c == 8) // backspace
         {
-            if (curr == NULL || curr == nullptr || curr->letter == '\0') 
+            if (curr == nullptr || curr->letter == '\0') 
             {
                 // do nothing
             }
@@ -410,6 +467,11 @@ int main()
         T = T->next;
         delete(T->prev);
     }
+    for (int i = 0; i < 10; i++)
+    {
+        delete(row[i]);
+    }
+    delete row;
 
     //delete start, end;// not everything
     /*cout << "\n checking start and end" << endl;
