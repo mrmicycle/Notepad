@@ -9,11 +9,7 @@
 //#include <stdafx.h>
 using namespace std;
 
-void gotoxy(int, int);
-//Nodes have a row indicator?
-// node is a member with current value
-// that passes on to followiing nodes? mebbe too complicated
-
+void gotoxy(short, short);
 //void ShowConsoleCursor(bool showFlag)
 //{
 //    HANDLE out = GetStdHandle()
@@ -21,7 +17,7 @@ void gotoxy(int, int);
 
 int main()
 {
-    int x, y;//coordinates on the screen. Controls the cursor, works alongside curr.
+    short x, y;//coordinates on the screen. Controls the cursor, works alongside curr.
     Node* start = nullptr;
     Node* end = nullptr;
     Node* curr = nullptr;//for inserting new nodes in custom positions
@@ -129,7 +125,7 @@ int main()
             {
                 ofstream savefile("myfile.txt");
 
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < rowNum; i++)//only go up to rownum, otherwise will save with whitespace
                 {
                     if (row[i] != nullptr)
                     {
@@ -175,11 +171,13 @@ int main()
             else if (curr == start)//delete something located at "start" but its not the beginning of the linked list **PROBLEM HERE**
             // CURRENT DOES NOT END UP WHERE I THINK IT DOES
             {
-                Node* del = curr;// mark curr? for deletion
-                curr->prev = row[rowNum];
-                curr->prev->next = curr->next;
+                Node* del = new Node();
+                del = curr;// mark curr? for deletion
+                curr->prev = row[rowNum];// point current to row pointer
+                curr->prev->next = curr->next;//point row pointer to after after current
                 start = start -> next;// move start to the next node **does this work???***
-                curr = row[rowNum];// curr ends up outside of the linked list in this case only
+                curr = row[rowNum];// curr becomes row pointer, outside of the linked list
+                start->prev = row[rowNum];
                 /*if (start != nullptr)
                     start->prev = nullptr;*/
                 delete (del);//delete the node
@@ -190,7 +188,8 @@ int main()
             }
             else if (curr->next != nullptr && curr->prev != nullptr)//deleting something in the middle 
             {
-                Node* del = curr;
+                Node* del = new Node();
+                del = curr;//marking curr for deletion
                 curr->prev->next = curr->next;//connect previous to next
                 curr->next->prev = curr->prev;//connect next to prev
                 curr = curr->prev;
@@ -471,7 +470,7 @@ int main()
     {
         delete(row[i]);
     }
-    delete row;
+    //delete row;
 
     //delete start, end;// not everything
     /*cout << "\n checking start and end" << endl;
@@ -482,7 +481,7 @@ int main()
     return 0;
 }
 
-void gotoxy(int x, int y) {
+void gotoxy(short x, short y) {
 
     COORD pos = { x, y };
 

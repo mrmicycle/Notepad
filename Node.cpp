@@ -4,6 +4,7 @@ Node::Node()
 {
     next = nullptr;
     prev = nullptr;
+    letter = '\0';
 }
 Node::Node(char c)
 {

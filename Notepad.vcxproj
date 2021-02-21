@@ -21,8 +21,10 @@
   <ItemGroup>
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Notepad.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Notepad.h" />
     <ClInclude Include="Node.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
