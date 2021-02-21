@@ -2,7 +2,10 @@
 #include <iomanip>
 #include <conio.h>
 #include <windows.h>
+#include <fstream>
+#include <string>
 #include "Node.h"
+
 //#include <stdafx.h>
 using namespace std;
 
@@ -23,11 +26,12 @@ int main()
     Node* end = nullptr;
     Node* curr = nullptr;//for inserting new nodes in custom positions
     Node* row[10];
-    // clean the row array to make it all nullptr, "clean"
+    // clean the row array to make it all nullptr
     for (int i = 0; i < 10; i++) {
         row[i] = nullptr;
     }
     char c;
+    string filename;
     int rowNum = 0;
     int rowMax = 9;
     int rowCount = 0;// this is SEPARATE from row num, will keep a running total of rows IN USE.
@@ -42,6 +46,8 @@ int main()
         cout << (int)c << endl;
     }*/
 
+    
+
 
     while (1)
     {
@@ -50,6 +56,40 @@ int main()
         if (c == 27) // escape loop
         {
             break;
+        }
+        else if (c == 0)//special for F keys
+        {
+            c = _getch();
+            if (c == 59)
+            {
+                //cout << "what is the name of your file?" << endl;
+                //getline(cin, filename);
+                ifstream openfile("myfile.txt");
+
+
+            }
+            if (c == 60)//f2 write to file
+            {
+                ofstream savefile("myfile.txt");
+
+                for (int i = 0; i < 10; i++)
+                {
+                    if (row[i] != nullptr)
+                    {
+                        Node* T;
+                        T = row[i]->next;
+                        while (T != nullptr)
+                        {
+
+                            savefile << T->letter;
+                            T = T->next;
+                        }
+                    }
+                    savefile << endl;//need to actually print out on the next line, this isn't controlled by goto
+                }
+
+                savefile.close();
+            }
         }
         else if (c == 13)//enter
         {
@@ -159,6 +199,7 @@ int main()
                 {
                     // do nothing!
                 }
+                //else if ()
                 else 
                 {
                     /*if (rowNum > 0)
@@ -169,38 +210,51 @@ int main()
                     }*/
                     y--;
                     rowNum--;
-                    // use rowNum to determine whether the cursor can move or not
                     curr = row[rowNum];// this puts it at the start of the previous row
-                    start = curr->next;
-
-                    // NEED TO SET END
-                    Node* check = start;
-                    while (check->next != nullptr)
-                        check = check->next;
-                    end = check;
-                    end->next = nullptr;
-                    //delete(check);
-
-
-                    //adjust for size x row
-                    for (int i = 0; i < x ; i++)
+                    // use rowNum to determine whether the cursor can move or not
+                    if (curr == nullptr)
                     {
-                        if (curr == end)
-                        {
-                            x = i;
-                            break;
-                        }
-                        else if (curr->next == nullptr)
-                        {
-                            //set end of row, then
-                            break;//break loop when curr reaches end of row.
-                        }
-                        else
-                        {
-                            curr = curr->next;
-                        }
-
+                        start = end = nullptr;
+                        x = 0;// puts cursor back at the start of the row since it is empty
+                        // do nothing with curr or start, because there is nothing in that row 
+                        // if curr->letter = '\0' then something was inserted
+                        // bc when i add a letter, i create a pointer in that row array
                     }
+                    else
+                    {
+                        start = curr->next;
+
+                        // NEED TO SET END
+                        Node* check = start;
+                        while (check->next != nullptr)
+                            check = check->next;
+                        end = check;
+                        end->next = nullptr;
+                        //delete(check);
+
+
+                        //adjust for size x row
+                        for (int i = 0; i < x; i++)
+                        {
+                            if (curr == end)
+                            {
+                                x = i;
+                                break;
+                            }
+                            else if (curr->next == nullptr)
+                            {
+                                //set end of row, then
+                                break;//break loop when curr reaches end of row.
+                            }
+                            else
+                            {
+                                curr = curr->next;
+                            }
+
+                        }
+                    }
+                    
+                    
                     
                 }
             }
@@ -218,6 +272,8 @@ int main()
                     curr = row[rowNum];// this puts it at the start of the next row
                     if (curr == nullptr)
                     {
+                        start = end = nullptr;
+                        x = 0;// puts cursor back at the start of the row since it is empty
                         // do nothing with curr or start, because there is nothing in that row 
                         // if curr->letter = '\0' then something was inserted
                         // bc when i add a letter, i create a pointer in that row array
@@ -292,7 +348,7 @@ int main()
                     curr = end;
                     x++;
             }
-            else if (curr == NULL || curr->letter == '\0')//allow new character at beginning, BEFORE start.
+            else if (curr == NULL || curr->letter == '\0')//allow new character at beginning, BEFORE start. CURRENT CAN'T BE NULL HERE
             {
                 // need to edit
                 // make new p curr
