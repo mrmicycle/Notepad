@@ -5,6 +5,6 @@ public:
     char letter;
     Node* next;
     Node* prev;
-    Node();
     Node(char);
+    Node();
 };

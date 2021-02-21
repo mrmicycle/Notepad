@@ -17,6 +17,13 @@ void gotoxy(short, short);
 
 int main()
 {
+    /*while (1)
+    {
+        c = _getch();
+        cout << (int)c << endl;
+    }*/
+
+    
     short x, y;//coordinates on the screen. Controls the cursor, works alongside curr.
     Node* start = nullptr;
     Node* end = nullptr;
@@ -31,21 +38,14 @@ int main()
     int rowNum = 0;
     int rowMax = 9;
     int rowCount = 0;// this is SEPARATE from row num, will keep a running total of rows IN USE.
-
-
     x = y = 0;
-    cout << "Start typing!" << endl;
+    cout << "Start typing!" << endl;//stays in main
 
-    /*while (1)
-    {
-        c = _getch();
-        cout << (int)c << endl;
-    }*/
-
+    
     
 
 
-    while (1)
+    while (1)// loop will prob stay in main as well
     {
         c = _getch();
         //cout << c; get rid of alphas
@@ -56,7 +56,7 @@ int main()
         else if (c == 0)//special for F keys
         {
             c = _getch();
-            if (c == 59)
+            if (c == 59)//f1 open file
             {
                 //cout << "what is the name of your file?" << endl;
                 //getline(cin, filename);
@@ -125,7 +125,7 @@ int main()
             {
                 ofstream savefile("myfile.txt");
 
-                for (int i = 0; i < rowNum; i++)//only go up to rownum, otherwise will save with whitespace
+                for (int i = 0; i <= rowNum; i++)//only go up to rownum, otherwise will save with whitespace
                 {
                     if (row[i] != nullptr)
                     {
@@ -153,7 +153,9 @@ int main()
             else
             {
                 rowNum++;
-                start = end = curr = nullptr;
+                start = end = nullptr;
+                row[rowNum] = new Node();//create new row when you press enter
+                curr = row[rowNum];
                 x = 0;// in a new row, go all the way left
                 y++;// and you go down one!
                 rowCount++;
@@ -171,16 +173,25 @@ int main()
             else if (curr == start)//delete something located at "start" but its not the beginning of the linked list **PROBLEM HERE**
             // CURRENT DOES NOT END UP WHERE I THINK IT DOES
             {
-                Node* del = new Node();
-                del = curr;// mark curr? for deletion
+                Node* del = curr;// mark curr? for deletion IS THIS NECESSARY????
                 curr->prev = row[rowNum];// point current to row pointer
                 curr->prev->next = curr->next;//point row pointer to after after current
-                start = start -> next;// move start to the next node **does this work???***
+                if (start->next != nullptr)//non-empty row
+                {
+                    start = start->next;// only move start to next node if there is more in the list
+                    start->prev = row[rowNum];// doesn't hurt
+                }    
+                else 
+                {
+                    curr->next = nullptr;//row is empty after deleting, make it point to nullptr
+                    start = nullptr;
+                    end = nullptr;
+                }
                 curr = row[rowNum];// curr becomes row pointer, outside of the linked list
-                start->prev = row[rowNum];
+                
                 /*if (start != nullptr)
                     start->prev = nullptr;*/
-                delete (del);//delete the node
+                //delete (del);//delete the node
                 //delete(start->prev);
                 //start->prev = nullptr;
                 x--;
@@ -268,7 +279,7 @@ int main()
                     rowNum--;
                     curr = row[rowNum];// this puts it at the start of the previous row
                     // use rowNum to determine whether the cursor can move or not
-                    if (curr == nullptr)
+                    if (curr->next == nullptr)//empty row
                     {
                         start = end = nullptr;
                         x = 0;// puts cursor back at the start of the row since it is empty
@@ -278,18 +289,18 @@ int main()
                     }
                     else
                     {
-                        start = curr->next;
-
+                        if (curr->next != nullptr)
+                            start = curr->next;//change start to first letter in row if that letter exists
                         // NEED TO SET END
                         Node* check = start;
                         while (check->next != nullptr)
                             check = check->next;
                         end = check;
-                        end->next = nullptr;
+                        end->next = nullptr;//not necessary?
                         //delete(check);
 
 
-                        //adjust for size x row
+                        //set cursor
                         for (int i = 0; i < x; i++)
                         {
                             if (curr == end)
@@ -326,7 +337,7 @@ int main()
                     y++;
                     rowNum++;
                     curr = row[rowNum];// this puts it at the start of the next row
-                    if (curr == nullptr)
+                    if (curr->next == nullptr)//if row is empty
                     {
                         start = end = nullptr;
                         x = 0;// puts cursor back at the start of the row since it is empty
@@ -336,7 +347,8 @@ int main()
                     }
                     else
                     {
-                        start = curr->next;//set start to first character in the row
+                        if (curr->next != nullptr)
+                            start = curr->next;//change start to first letter in row if that letter exists
                         //if (curr == nullptr && curr == end) 
                         //{
                         //    // similar to presing enter
@@ -347,7 +359,7 @@ int main()
 
                         // NEED TO SET END
                         Node* check = start;
-                        while (check->next != nullptr)
+                        while (check->next != nullptr)//if i delete a row between two populated rows, going down into it makes it crash
                             check = check->next;
                         end = check;
                         end->next = nullptr;
@@ -381,44 +393,59 @@ int main()
         }
         else //normal characters
         {
-            if (start == nullptr)//first character
+            if (start == nullptr)//first character in a given row
             {
                 Node* p = new Node(c);
-                row[rowNum] = new Node(NULL);
-                start = p;
-                end = start;
-                curr = end;
+                //if statement here
+                if (row[rowNum] == nullptr)//has the user pressed enter for this row
+                    row[rowNum] = new Node();
+                row[rowNum]->next = p;
+                p->prev = row[rowNum];
                 x++;
-                row[rowNum]->next = start;
-                start->prev = row[rowNum];
-            }
-            /*if (curr == start) {
 
-            }*/
+                start = p;
+                end = p;
+                curr = p;
+            }
+            
             else if (curr == end)//adding new characters at the end of the linked list (row?)
             {
-                    Node* p = new Node(c);
-                    end->next = p;
-                    p->prev = end;
-                    end = p;
-                    curr = end;
-                    x++;
+                Node* p = new Node(c);
+                end->next = p;
+                p->prev = end;
+                end = p;
+                curr = end;
+                x++;
             }
-            else if (curr == NULL || curr->letter == '\0')//allow new character at beginning, BEFORE start. CURRENT CAN'T BE NULL HERE
+            else if (curr == NULL || curr->letter == '\0')//allow new character at beginning CURRENT CAN'T BE NULL HERE
             {
                 // need to edit
                 // make new p curr
                 // make new p start
                 Node* p = new Node(c);
-                p->next = start;
-                start->prev = p;
+                if (curr->next != nullptr)//if row is not empty
+                {
+                    p->next = start;//set new node next to start
+                    start->prev = p;
+                }
                 p->prev = curr;//point new node to current row
                 curr->next = p;// make row point to new node
                 start = p;
                 curr = p;
                 x++;
-            }               
-            else if ((curr->next != nullptr && curr->prev != nullptr) || curr == start)//is there anything to the left and right? (insert)
+            }
+            else if (curr == start)
+            {
+                Node* p = new Node(c);
+                p->next = curr->next;
+                p->prev = curr;
+                if (curr->next != nullptr)// if next node is not null
+                    curr->next->prev = p;// make the current next node point BACK to the new node p
+                curr->next = p;
+                curr = p;
+                x++;
+            }
+            else if (curr->next != nullptr && curr->prev != nullptr)//is there anything to the left and right? (insert)
             {
                 Node* p = new Node(c);//create new, Need to change 4 pointers.
                 p->next = curr->next;// make new node point to the current next node
@@ -436,6 +463,7 @@ int main()
             {
                 Node* T;
                 T = row[i]->next;//get first letter of row;
+                
                 while (T != nullptr)
                 {
                     
@@ -481,7 +509,7 @@ int main()
     return 0;
 }
 
-void gotoxy(short x, short y) {
+void gotoxy(short x, short y) {//move to editor??
 
     COORD pos = { x, y };
 
