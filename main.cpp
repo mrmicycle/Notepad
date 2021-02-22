@@ -10,6 +10,8 @@ using namespace std;
 
 int main()
 {
+    // There is a file "myfile.txt" included with the program if you would like to load it!
+
     Notepad np;// create notepad object
 
     np.Title();

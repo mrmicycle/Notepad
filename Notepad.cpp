@@ -116,7 +116,7 @@ void Notepad::readf()
 {
     gotoxy(0, 29);
     cout << "Please type the name of your file: ";
-    getline(cin, filename);// this will save the filename to notepad before opening
+    cin >> filename;// this will save the filename to notepad before opening
     ifstream openfile(filename);
 
     while (openfile >> noskipws >> c) {// read each character from file without skipping whitespaces
@@ -125,7 +125,7 @@ void Notepad::readf()
         {
             start = end = nullptr;// back to beginning of row
             rowNum++;
-            row[rowNum] = new Node();
+            row[rowNum] = new Node();// since this is just like pressing enter, curr needs to be pointing to the current row pointer.
             curr = row[rowNum];
             rowCount++;
             y++;
@@ -184,12 +184,21 @@ void Notepad::savef()
 {
     // possible asking for name of file
     gotoxy(0, 29);
-    cout << "would you like to save to the same file? type y or n: ";
-    cin >> save;
-    if (save == 'n')
+    if (filename == "")// prompt for a new file name if they haven't already opened one. 
     {
         cout << "ok, please type the name of your file: ";
         cin >> filename;// this will save the filename to notepad before opening
+    }
+    else// the user has already opened a file and can possible save to the same file.
+    {
+        cout << "would you like to save to the same file? type y or n: ";
+        cin >> save;
+        if (save == 'n')
+        {
+            cout << "ok, please type the name of your file: ";
+            cin >> filename;// this will save the filename to notepad before opening
+        }
+
     }
     ofstream savefile(filename);//open a new file to save to
 
@@ -270,10 +279,9 @@ void Notepad::run()
                 // do nothing
             }
 
-            else if (curr == start)// delete something located at "start" but its not the beginning of the linked list **PROBLEM HERE**
-            // CURRENT DOES NOT END UP WHERE I THINK IT DOES
+            else if (curr == start)// delete something located at "start" but its not the beginning of the linked list 
             {
-                Node* del = curr;// mark curr? for deletion IS THIS NECESSARY????
+                Node* del = curr;// mark curr for deletion
                 curr->prev = row[rowNum];// point current to row pointer
                 curr->prev->next = curr->next;// point row pointer to after after current
                 if (start->next != nullptr)// non-empty row
@@ -492,7 +500,7 @@ void Notepad::run()
                 curr = p;
                 x++;
             }
-            else if (curr == start)
+            else if (curr == start)// case where curr is at the start, but there are other letters in the row.
             {
                 Node* p = new Node(c);
                 p->next = curr->next;
@@ -531,10 +539,8 @@ void Notepad::run()
             }
             cout << endl;// need to actually print out on the next line, this isn't controlled by goto
         }
-        Menu();
-        gotoxy(x, y);
-
-
+        Menu();// keeps the menu visible.
+        gotoxy(x, y);//sets the cursor to where it should be.
     }
 }
 
