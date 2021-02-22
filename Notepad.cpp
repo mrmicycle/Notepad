@@ -52,47 +52,81 @@ void Notepad::ShowConsoleCursor(bool showFlag)
 
 void Notepad::Title()
 {
-    gotoxy(50, 7);
-    cout << "Welcome to" << endl;
-    gotoxy(19, 10);
-    cout << "##       #### ##    ## ##    ##         ##    ##    ##  #######  ######## ######## " << endl;
-    gotoxy(19, 11);
-    cout << "##        ##  ###   ## ##   ##           ##   ###   ## ##     ##    ##    ##       " << endl;
-    gotoxy(19, 12);
-    cout << "##        ##  ####  ## ##  ##             ##  ####  ## ##     ##    ##    ##       " << endl;
-    gotoxy(19, 13);
-    cout << "##        ##  ## ## ## #####    #######    ## ## ## ## ##     ##    ##    ######   " << endl;
-    gotoxy(19, 14);
-    cout << "##        ##  ##  #### ##  ##             ##  ##  #### ##     ##    ##    ##       " << endl;
-    gotoxy(19, 15);
-    cout << "##        ##  ##   ### ##   ##           ##   ##   ### ##     ##    ##    ##       " << endl;
-    gotoxy(19, 16);
-    cout << "######## #### ##    ## ##    ##         ##    ##    ##  #######     ##    ######## " << endl;
-    gotoxy(25, 20);
-    cout << "Press any key to start typing! Or open a file by pressing F1";
+        while (1)//keep menu up, wait for user input
+    {
+        ShowConsoleCursor(false);
+        Menu();
+
+        gotoxy(50, 7);
+        cout << "Welcome to" << endl;
+        gotoxy(19, 10);
+        cout << "##       #### ##    ## ##    ##         ##    ##    ##  #######  ######## ######## " << endl;
+        gotoxy(19, 11);
+        cout << "##        ##  ###   ## ##   ##           ##   ###   ## ##     ##    ##    ##       " << endl;
+        gotoxy(19, 12);
+        cout << "##        ##  ####  ## ##  ##             ##  ####  ## ##     ##    ##    ##       " << endl;
+        gotoxy(19, 13);
+        cout << "##        ##  ## ## ## #####    #######    ## ## ## ## ##     ##    ##    ######   " << endl;
+        gotoxy(19, 14);
+        cout << "##        ##  ##  #### ##  ##             ##  ##  #### ##     ##    ##    ##       " << endl;
+        gotoxy(19, 15);
+        cout << "##        ##  ##   ### ##   ##           ##   ##   ### ##     ##    ##    ##       " << endl;
+        gotoxy(19, 16);
+        cout << "######## #### ##    ## ##    ##         ##    ##    ##  #######     ##    ######## " << endl;
+        gotoxy(25, 20);
+        cout << "Press a key twice to start typing! Or open a file by pressing F1";
+        
+
+        Sleep(100);
+        if (_kbhit())
+        {
+            char x = _getch();//put this inside of title since that goes away after the program starts to run
+            if (x == 0)
+            {
+                x = _getch();
+                if (x == 59)// read/open file
+                {
+                    //system("cls");//clear title screen
+                    readf();
+                    ShowConsoleCursor(true);// show cursor
+                    system("cls");// turn off title splash
+                    break;//exit loop
+                }
+            }
+            else
+            {
+                // pressed some other key to start program.
+                system("cls");
+                gotoxy(0, 0);
+                ShowConsoleCursor(true);// show cursor
+                break;
+            }
+        }
+    }
 }
 
 void Notepad::Menu()
 {
     //display menu at the bottom of the screen, always
-    //use y=27 or 28 to make a vim men
     gotoxy(0, 28);
-    cout << "F1: Open File | F2: Save | Esc: exit" << endl;
+    cout << "F1: Open File | F2: Save | Esc: exit | Filename: " << filename << endl;
 }
 
 void Notepad::readf()
 {
-    // possible asking for name of file
-    // cout << "what is the name of your file?" << endl;
-    // getline(cin, filename);
-    ifstream openfile("myfile.txt");
+    gotoxy(0, 29);
+    cout << "Please type the name of your file: ";
+    getline(cin, filename);// this will save the filename to notepad before opening
+    ifstream openfile(filename);
 
     while (openfile >> noskipws >> c) {// read each character from file without skipping whitespaces
         // convert each character to a linked list
         if (c == '\n')// newline, specific to reading from file.
         {
-            start = end = curr = nullptr;// back to beginning of row
+            start = end = nullptr;// back to beginning of row
             rowNum++;
+            row[rowNum] = new Node();
+            curr = row[rowNum];
             rowCount++;
             y++;
             x = 0;// cursor back to the beginning of the row
@@ -143,14 +177,21 @@ void Notepad::readf()
         }
     }
     openfile.close();
+    //gotoxy(x,y);
 }
 
 void Notepad::savef()
 {
     // possible asking for name of file
-    // cout << "what is the name of your file?" << endl;
-    // getline(cin, filename);
-    ofstream savefile("myfile.txt");
+    gotoxy(0, 29);
+    cout << "would you like to save to the same file? type y or n: ";
+    cin >> save;
+    if (save == 'n')
+    {
+        cout << "ok, please type the name of your file: ";
+        cin >> filename;// this will save the filename to notepad before opening
+    }
+    ofstream savefile(filename);//open a new file to save to
 
     for (int i = 0; i <= rowNum; i++)// only go up to rownum, otherwise will save with whitespace
     {
@@ -169,6 +210,9 @@ void Notepad::savef()
     }
 
     savefile.close();
+    //gotoxy(0, 29);
+    cout << " File saved!";
+    Sleep(500); // short pause so user can see that the file is saved.
     
     
 }
@@ -176,9 +220,11 @@ void Notepad::savef()
 void Notepad::run()
 {
     Menu();//make sure the menu shows as soon as you enter the text editor
-    gotoxy(0, 0);
+    gotoxy(0, 0);//reset the cursor
+    cout << "press a key to start!";
     while (1)// loop will prob stay in main as well
     {
+        
         c = _getch();
         // cout << c; get rid of alphas
         if (c == 27) // escape loop

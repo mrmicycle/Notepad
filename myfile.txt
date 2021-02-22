@@ -1,6 +1,3 @@
-asdfasdfasdfasdf
-asdfasdfasdfasdf
-asdfasdfasdfasdfas
-sdfaasdf
-sdfasdf
-asdfasdfasdfasdf
+hello my name is michael.
+this is a file.
+it should open in my program :)
