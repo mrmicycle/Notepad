@@ -6,7 +6,7 @@ using namespace std;
 class Notepad
 {
 public:
-    int x, y;//coordinates on the screen. Controls the cursor, works alongside curr.
+    short x, y;//coordinates on the screen. Controls the cursor, works alongside curr.
     int rowNum;
     int rowMax;
     int rowCount;// this is SEPARATE from row num, will keep a running total of rows IN USE.
@@ -17,7 +17,13 @@ public:
     Node* row[10];
     string filename;
     Notepad();
-    void setchar(char);
+    void setFileName(string);
     void readf();
     void savef();
+    void cleanPoint();
+    void run();
+    void gotoxy(short, short);
+    void ShowConsoleCursor(bool);
+    void Title();
+    void Menu();
 };
